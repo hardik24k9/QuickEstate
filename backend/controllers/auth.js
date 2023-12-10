@@ -3,7 +3,7 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
 
-export const signup = async (req, res, next) => {
+export const signUp = async (req, res, next) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcryptjs.hashSync(password, 10);
   const newUser = new User({ username, email, password: hashedPassword });
@@ -16,7 +16,7 @@ export const signup = async (req, res, next) => {
   }
 };
 
-export const signin = async (req, res, next) => {
+export const signIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     // firstly check if email is valid or not
@@ -35,6 +35,56 @@ export const signin = async (req, res, next) => {
       .cookie("access_token", token, { httpOnly: true })
       .status(200)
       .json(validUserData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const googleAuth = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    // in case user exists, we do the signin process else signup process
+    if (user) {
+      // generate the jwt token for the user
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+      const { password: pass, ...userData } = user._doc;
+      res
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(userData);
+    } else {
+      // generate a random password for the user which can be changed by the user
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+      // username from google will be default name such as "Hardik Pachouri", so we need to remove space & make it unique
+      const userName =
+        req.body.name.split(" ").join("").toLowerCase() +
+        Math.random().toString(36).slice(-4);
+
+      const userData = {
+        username: userName,
+        email: req.body.email,
+        password: hashedPassword,
+        avatar: req.body.photo,
+      };
+
+      const newUser = new User(userData);
+      await newUser.save();
+
+      // generate the jwt token for the user
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+
+      const { password: pass, ...validUserData } = newUser._doc;
+      res
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(validUserData);
+    }
   } catch (error) {
     next(error);
   }

@@ -29,6 +29,6 @@ export const updateUserInfo = async (req, res, next) => {
 
     return res.status(200).json(userData);
   } catch (error) {
-    next(error);
+    next(errorHandler(403, error.message));
   }
 };

@@ -19,6 +19,7 @@ import {
   signOutUserFailure,
   signOutUserSuccess,
 } from "../stores/userSlice";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const profileImg = useRef(null);
@@ -187,6 +188,11 @@ const Profile = () => {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link to="/create-listing">
+          <button className="bg-green-700 text-white w-full rounded-lg p-3 uppercase hover:opacity-95">
+            Create Listing
+          </button>
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span

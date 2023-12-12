@@ -15,6 +15,9 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  signOutUserStart,
+  signOutUserFailure,
+  signOutUserSuccess,
 } from "../stores/userSlice";
 
 const Profile = () => {
@@ -106,6 +109,25 @@ const Profile = () => {
     }
   };
 
+  const handleSignOutUser = async () => {
+    dispatch(signOutUserStart());
+
+    try {
+      const resp = await axios.get("/api/auth/signout", {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (resp.status === false) {
+        dispatch(signOutUserFailure(resp.message));
+        return;
+      }
+
+      dispatch(signOutUserSuccess());
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
+    }
+  };
+
   return (
     <div className="p-3 max-w-md mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -173,7 +195,12 @@ const Profile = () => {
         >
           Delete account
         </span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleSignOutUser}
+        >
+          Sign out
+        </span>
       </div>
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
       <p className="text-green-700 mt-5">

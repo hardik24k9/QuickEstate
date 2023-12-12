@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 
 import userRouter from "./routes/user.js";
 import authRouter from "./routes/auth.js";
+import listingRouter from "./routes/listing.js";
 
 mongoose
   .connect(process.env.MONGO_URL)
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

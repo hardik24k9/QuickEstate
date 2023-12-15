@@ -183,7 +183,7 @@ const UpdateListing = () => {
       <h1 className="text-3xl font-semibold text-center my-7">
         Update Listing
       </h1>
-      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 lg:flex-row">
         <div className="flex flex-col gap-4 flex-1">
           <input
             type="text"
@@ -266,64 +266,68 @@ const UpdateListing = () => {
               <span>Offer</span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-6">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap mt-1 gap-5">
+            <div className="flex items-center gap-4 lg:gap-2">
               <input
                 type="number"
                 id="bedrooms"
                 min="1"
                 max="10"
                 required
-                className="p-3 border border-gray-300 rounded-lg"
+                className="p-3 border border-gray-300 rounded-lg w-[120px] lg:w-[150px]"
                 value={formData.bedrooms}
                 onChange={handleChange}
               />
               <p>Beds</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4 lg:gap-2">
               <input
                 type="number"
                 id="bathrooms"
                 min="1"
                 max="10"
                 required
-                className="p-3 border border-gray-300 rounded-lg"
+                className="p-3 border border-gray-300 rounded-lg w-[120px] lg:w-[150px]"
                 value={formData.bathrooms}
                 onChange={handleChange}
               />
               <p>Baths</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4 lg:gap-2">
               <input
                 type="number"
                 id="regularPrice"
                 min="50"
                 max="10000000"
                 required
-                className="p-3 border border-gray-300 rounded-lg"
+                className="p-3 border border-gray-300 rounded-lg w-[120px] lg:w-[150px]"
                 value={formData.regularPrice}
                 onChange={handleChange}
               />
               <div className="flex flex-col items-center">
                 <p>Regular price</p>
-                <span className="text-xs">($ / month)</span>
+                {formData.type === "rent" && (
+                  <span className="text-xs">($ / month)</span>
+                )}
               </div>
             </div>
             {formData.offer && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4 lg:gap-2">
                 <input
                   type="number"
                   id="discountPrice"
                   min="0"
                   max="10000000"
                   required
-                  className="p-3 border border-gray-300 rounded-lg"
+                  className="p-3 border border-gray-300 rounded-lg w-[120px] lg:w-[150px]"
                   value={formData.discountPrice}
                   onChange={handleChange}
                 />
                 <div className="flex flex-col items-center">
                   <p>Discounted price</p>
-                  <span className="text-xs">($ / month)</span>
+                  {formData.type === "rent" && (
+                    <span className="text-xs">($ / month)</span>
+                  )}
                 </div>
               </div>
             )}

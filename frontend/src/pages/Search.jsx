@@ -15,6 +15,7 @@ export const Search = () => {
   });
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -65,6 +66,21 @@ export const Search = () => {
     navigate(`/search?${searchQuery}`);
   };
 
+  const showMoreClick = async () => {
+    const numberOfListings = listings.length;
+    const startIndex = numberOfListings;
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("startIndex", startIndex);
+    const searchQuery = urlParams.toString();
+    const resp = await axios.get(`/api/listing/search?${searchQuery}`);
+    const data = resp.data;
+
+    if (data.length < 9) {
+      setShowMore(false);
+    }
+    setListings([...listings, ...data]);
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromURL = urlParams.get("searchTerm");
@@ -103,6 +119,12 @@ export const Search = () => {
       if (response.success === false) {
         setLoading(false);
         return;
+      }
+
+      if (response.data.length > 8) {
+        setShowMore(true);
+      } else {
+        setShowMore(false);
       }
 
       setListings(response.data);
@@ -214,7 +236,7 @@ export const Search = () => {
           </button>
         </form>
       </div>
-      <div className="">
+      <div className="flex-1">
         <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-2 lg:mt-5">
           Listing results:
         </h1>
@@ -233,6 +255,14 @@ export const Search = () => {
             listings.map((listing) => (
               <ListingItem key={listing._id} listing={listing} />
             ))}
+          {showMore && (
+            <button
+              onClick={showMoreClick}
+              className="text-green-700 hover:underline p-7 text-center w-full"
+            >
+              Show more
+            </button>
+          )}
         </div>
       </div>
     </div>

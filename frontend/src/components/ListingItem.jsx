@@ -6,10 +6,7 @@ const ListingItem = ({ listing }) => {
     <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full my-1 sm:w-[330px] sm:m-1">
       <Link to={`/listing/${listing._id}`}>
         <img
-          src={
-            listing.imageUrls[0] ||
-            "https://53.fs1.hubspotusercontent-na1.net/hub/53/hubfs/Sales_Blog/real-estate-business-compressor.jpg?width=595&height=400&name=real-estate-business-compressor.jpg"
-          }
+          src={listing.imageUrls[0] || import.meta.env.VITE_BG_IMG_URL}
           alt="listing cover"
           className="h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-scale duration-300"
         />
@@ -27,7 +24,7 @@ const ListingItem = ({ listing }) => {
             {listing.description}
           </p>
           <p className="text-slate-500 mt-2 font-semibold">
-            $
+            &#8377;
             {listing.offer
               ? listing.discountPrice.toLocaleString("en-US")
               : listing.regularPrice.toLocaleString("en-US")}

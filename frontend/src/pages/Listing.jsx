@@ -92,7 +92,7 @@ const Listing = () => {
           )}
           <div className="flex flex-col max-w-4xl mx-auto p-6 my-5 gap-4">
             <p className="text-2xl font-semibold">
-              {listing.name} - ${" "}
+              {listing.name} - &#8377;{" "}
               {listing.offer
                 ? listing.discountPrice.toLocaleString("en-US")
                 : listing.regularPrice.toLocaleString("en-US")}

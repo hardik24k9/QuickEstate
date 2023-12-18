@@ -20,6 +20,7 @@ import {
   signOutUserSuccess,
 } from "../stores/userSlice";
 import { Link } from "react-router-dom";
+import { getErrorMessage, validateFormData } from "../utils/validateAuthData";
 
 const Profile = () => {
   const profileImg = useRef(null);
@@ -75,6 +76,12 @@ const Profile = () => {
     event.preventDefault();
     dispatch(updateUserStart());
 
+    const formError = validateFormData(formData);
+    if (formError) {
+      dispatch(updateUserFailure(formError));
+      return;
+    }
+
     try {
       const response = await axios.post(
         `/api/user/update/${currentUser._id}`,
@@ -90,8 +97,13 @@ const Profile = () => {
 
       dispatch(updateUserSuccess(response.data));
       setUpdateSuccess(true);
+      setTimeout(() => {
+        setUpdateSuccess(false);
+      }, 2000);
     } catch (error) {
-      dispatch(updateUserFailure(error.message));
+      const { message } = error.response.data;
+      const errorMessage = getErrorMessage(message);
+      dispatch(updateUserFailure(errorMessage));
     }
   };
 
@@ -209,6 +221,7 @@ const Profile = () => {
           id="username"
           className="border p-3 rounded-lg"
           onChange={handleUserDetailsChange}
+          required
         />
         <input
           type="email"
@@ -217,6 +230,7 @@ const Profile = () => {
           id="email"
           className="border p-3 rounded-lg"
           onChange={handleUserDetailsChange}
+          required
         />
         <input
           type="password"
@@ -252,7 +266,7 @@ const Profile = () => {
         </span>
       </div>
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
-      <p className="text-green-700 mt-5">
+      <p className="text-green-700 my-4">
         {updateSuccess ? "User is updated successfully!" : ""}
       </p>
       <button onClick={handleShowListings} className="text-green-700 w-full">
@@ -262,45 +276,49 @@ const Profile = () => {
         {showListingsError ? "Error showing listings" : ""}
       </p>
       {/** show all the listings created by the user */}
-      {showListings && userListings && userListings.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <h1 className="text-center mt-7 text-2xl font-semibold">
-            Your Listings
-          </h1>
-          {userListings.map((listing) => (
-            <div
-              key={listing._id}
-              className="border rounded-lg p-3 flex justify-between items-center gap-4 px-4"
-            >
-              <Link to={`/listing/${listing._id}`}>
-                <img
-                  src={listing.imageUrls[0]}
-                  alt="listing cover"
-                  className="h-16 w-16 object-contain"
-                />
-              </Link>
-              <Link
-                className="text-slate-700 font-semibold  hover:underline truncate flex-1"
-                to={`/listing/${listing._id}`}
+      {showListings &&
+        userListings &&
+        (userListings.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            <h1 className="text-center mt-7 text-2xl font-semibold">
+              Your Listings
+            </h1>
+            {userListings.map((listing) => (
+              <div
+                key={listing._id}
+                className="border rounded-lg p-3 flex justify-between items-center gap-4 px-4"
               >
-                <p>{listing.name}</p>
-              </Link>
-
-              <div className="flex flex-col item-center">
-                <button
-                  className="text-red-700 uppercase"
-                  onClick={() => handleListingDelete(listing._id)}
-                >
-                  Delete
-                </button>
-                <Link to={`/update-listing/${listing._id}`}>
-                  <button className="text-green-700 uppercase">Edit</button>
+                <Link to={`/listing/${listing._id}`}>
+                  <img
+                    src={listing.imageUrls[0]}
+                    alt="listing cover"
+                    className="h-16 w-16 object-contain"
+                  />
                 </Link>
+                <Link
+                  className="text-slate-700 font-semibold  hover:underline truncate flex-1"
+                  to={`/listing/${listing._id}`}
+                >
+                  <p>{listing.name}</p>
+                </Link>
+
+                <div className="flex flex-col item-center">
+                  <button
+                    className="text-red-700 uppercase"
+                    onClick={() => handleListingDelete(listing._id)}
+                  >
+                    Delete
+                  </button>
+                  <Link to={`/update-listing/${listing._id}`}>
+                    <button className="text-green-700 uppercase">Edit</button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : (
+          <p className="text-center">No Listings Found!</p>
+        ))}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import { getErrorMessage, validateFormData } from "../utils/validateAuthData";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -18,32 +19,36 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // add check for client side validation
+    const formError = validateFormData(formData);
+    if (formError) {
+      setError(formError);
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "/api/auth/signup",
-        JSON.stringify(formData),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = res.data;
-      console.log(data);
+      await axios.post("/api/auth/signup", JSON.stringify(formData), {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       setError(null);
       setLoading(false);
       navigate("/sign-in");
     } catch (error) {
       setLoading(false);
-      setError(error.message);
+      const { message } = error.response.data;
+      const errorMessage = getErrorMessage(message);
+      setError(errorMessage);
     }
   };
 
   return (
-    <div className="p-3 max-w-sm mx-auto">
+    <div className="p-6 max-w-sm mx-auto lg:p-3">
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
@@ -52,6 +57,7 @@ const SignUp = () => {
           className="border p-3 rounded-lg"
           id="username"
           onChange={handleChange}
+          required
         />
         <input
           type="email"
@@ -59,6 +65,7 @@ const SignUp = () => {
           className="border p-3 rounded-lg"
           id="email"
           onChange={handleChange}
+          required
         />
         <input
           type="password"
@@ -66,6 +73,7 @@ const SignUp = () => {
           className="border p-3 rounded-lg"
           id="password"
           onChange={handleChange}
+          required
         />
         <button
           disabled={loading}

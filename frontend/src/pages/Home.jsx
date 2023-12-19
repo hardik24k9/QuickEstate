@@ -6,6 +6,7 @@ import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css/bundle";
 import ListingItem from "../components/ListingItem";
+import { APIS } from "../utils/constants";
 
 const Home = () => {
   const [offerListings, setOfferListings] = useState([]);
@@ -16,7 +17,9 @@ const Home = () => {
   useEffect(() => {
     const fetchOfferListings = async () => {
       try {
-        const resp = await axios.get("/api/listing/search?offer=true&limit=4");
+        const resp = await axios.get(
+          `${APIS.LISTING.SEARCH_URL}?offer=true&limit=4`
+        );
         setOfferListings(resp.data);
         fetchRentListings();
       } catch (error) {
@@ -26,7 +29,9 @@ const Home = () => {
 
     const fetchRentListings = async () => {
       try {
-        const resp = await axios.get("/api/listing/search?type=rent&limit=4");
+        const resp = await axios.get(
+          `${APIS.LISTING.SEARCH_URL}?type=rent&limit=4`
+        );
         setRentListings(resp.data);
         fetchSellListings();
       } catch (error) {
@@ -36,7 +41,9 @@ const Home = () => {
 
     const fetchSellListings = async () => {
       try {
-        const resp = await axios.get("/api/listing/search?type=sell&limit=4");
+        const resp = await axios.get(
+          `${APIS.LISTING.SEARCH_URL}?type=sell&limit=4`
+        );
         setSellListings(resp.data);
       } catch (error) {
         console.log(error);

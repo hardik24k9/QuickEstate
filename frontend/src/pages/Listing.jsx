@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import Contact from "../components/Contact";
+import { APIS } from "../utils/constants";
 
 const Listing = () => {
   SwiperCore.use([Navigation]);
@@ -31,7 +32,7 @@ const Listing = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `/api/listing/find/${params.listingId}`
+          `${APIS.LISTING.FETCH_LISTING_URL}/${params.listingId}`
         );
 
         if (response.success === false) {

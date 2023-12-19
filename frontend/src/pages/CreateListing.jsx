@@ -9,6 +9,7 @@ import {
 } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { APIS, ERROR_MESSAGES } from "../utils/constants";
 
 const CreateListing = () => {
   const [files, setFiles] = useState([]);
@@ -57,11 +58,11 @@ const CreateListing = () => {
           setUploading(false);
         })
         .catch((error) => {
-          setImageUploadError("Image upload failed (2 mb max per image)");
+          setImageUploadError(ERROR_MESSAGES.IMAGE_MAX_SIZE_ERROR);
           setUploading(false);
         });
     } else {
-      setImageUploadError("You can only upload 6 images per listing");
+      setImageUploadError(ERROR_MESSAGES.MAX_IMAGES_UPLOAD_ERROR);
       setUploading(false);
     }
   };
@@ -130,16 +131,16 @@ const CreateListing = () => {
     e.preventDefault();
     try {
       if (formData.imageUrls.length < 1)
-        return setError("You must upload at least one image");
+        return setError(ERROR_MESSAGES.MIN_ONE_IMAGE_REQUIRED_ERROR);
 
       if (+formData.regularPrice < +formData.discountPrice)
-        return setError("Discount price must be lower than regular price");
+        return setError(ERROR_MESSAGES.DISCOUNT_PRICE_CHECK_ERROR);
 
       setLoading(true);
       setError(false);
 
       const resp = await axios.post(
-        "/api/listing/create",
+        APIS.LISTING.CREATE_URL,
         JSON.stringify({
           ...formData,
           userRef: currentUser._id,

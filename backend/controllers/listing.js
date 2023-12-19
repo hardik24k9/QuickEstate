@@ -14,11 +14,11 @@ export const deleteListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
 
   if (!listing) {
-    next(errorHandler(404, "Listing not found!"));
+    return next(errorHandler(404, "Listing not found!"));
   }
 
   if (listing.userRef !== req.user.id) {
-    next(errorHandler(401, "You can only delete your own listings!"));
+    return next(errorHandler(401, "You can only delete your own listings!"));
   }
 
   try {
@@ -106,7 +106,6 @@ export const getListings = async (req, res, next) => {
 
     res.status(200).json(listings);
   } catch (error) {
-    console.log(error.message);
     next(error);
   }
 };

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { getErrorMessage, validateFormData } from "../utils/validateAuthData";
+import { APIS } from "../utils/constants";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -30,7 +31,7 @@ const SignUp = () => {
     try {
       setLoading(true);
 
-      await axios.post("/api/auth/signup", JSON.stringify(formData), {
+      await axios.post(APIS.AUTH.SIGN_UP_URL, JSON.stringify(formData), {
         headers: {
           "Content-Type": "application/json",
         },

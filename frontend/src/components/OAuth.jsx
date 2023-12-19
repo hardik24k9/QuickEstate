@@ -3,7 +3,8 @@ import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { signInSuccess } from "../stores/userSlice";
+import { signInFailure, signInSuccess } from "../stores/userSlice";
+import { APIS, ERROR_MESSAGES } from "../utils/constants";
 
 const OAuth = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const OAuth = () => {
       };
 
       const res = await axios.post(
-        "/api/auth/google",
+        APIS.AUTH.GOOGLE_AUTH_URL,
         JSON.stringify(userData),
         {
           headers: {
@@ -34,7 +35,7 @@ const OAuth = () => {
       dispatch(signInSuccess(res.data));
       navigate("/");
     } catch (error) {
-      console.log("could not sign in with google", error);
+      dispatch(signInFailure(ERROR_MESSAGES.GOOGLE_AUTH_FAILURE_ERROR));
     }
   };
 

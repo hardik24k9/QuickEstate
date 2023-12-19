@@ -30,8 +30,7 @@ export const updateUserInfo = async (req, res, next) => {
 
     return res.status(200).json(userData);
   } catch (error) {
-    console.log(error);
-    next(errorHandler(403, error.message));
+    return next(errorHandler(403, error.message));
   }
 };
 
@@ -51,7 +50,7 @@ export const deleteUser = async (req, res, next) => {
 
 export const getUserListings = async (req, res, next) => {
   if (req.params.id !== req.user.id) {
-    next(errorHandler(401, "you can only view your own listings!"));
+    return next(errorHandler(401, "you can only view your own listings!"));
   } else {
     try {
       const listings = await Listing.find({ userRef: req.params.id });
@@ -66,7 +65,7 @@ export const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      next(errorHandler(404, "User not found!"));
+      return next(errorHandler(404, "User not found!"));
     }
     const { password, ...userData } = user._doc;
     res.status(200).json(userData);

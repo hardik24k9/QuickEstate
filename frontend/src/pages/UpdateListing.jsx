@@ -9,6 +9,7 @@ import {
 } from "firebase/storage";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { APIS, ERROR_MESSAGES } from "../utils/constants";
 
 const UpdateListing = () => {
   const [files, setFiles] = useState([]);
@@ -36,10 +37,11 @@ const UpdateListing = () => {
 
   useEffect(() => {
     const fetchListingData = async () => {
-      const resp = await axios.get(`/api/listing/find/${params.listingId}`);
+      const resp = await axios.get(
+        `${APIS.LISTING.FETCH_LISTING_URL}/${params.listingId}`
+      );
 
       if (resp.status === false) {
-        console.log(resp.message);
         return;
       }
       setFormData(resp.data);
@@ -72,11 +74,11 @@ const UpdateListing = () => {
           setUploading(false);
         })
         .catch((error) => {
-          setImageUploadError("Image upload failed (2 mb max per image)");
+          setImageUploadError(ERROR_MESSAGES.IMAGE_MAX_SIZE_ERROR);
           setUploading(false);
         });
     } else {
-      setImageUploadError("You can only upload 6 images per listing");
+      setImageUploadError(ERROR_MESSAGES.MAX_IMAGES_UPLOAD_ERROR);
       setUploading(false);
     }
   };
@@ -145,16 +147,16 @@ const UpdateListing = () => {
     e.preventDefault();
     try {
       if (formData.imageUrls.length < 1)
-        return setError("You must upload at least one image");
+        return setError(ERROR_MESSAGES.MIN_ONE_IMAGE_REQUIRED_ERROR);
 
       if (+formData.regularPrice < +formData.discountPrice)
-        return setError("Discount price must be lower than regular price");
+        return setError(ERROR_MESSAGES.DISCOUNT_PRICE_CHECK_ERROR);
 
       setLoading(true);
       setError(false);
 
       const resp = await axios.post(
-        `/api/listing/update/${params.listingId}`,
+        `${APIS.LISTING.UPDATE_URL}/${params.listingId}`,
         JSON.stringify({
           ...formData,
           userRef: currentUser._id,

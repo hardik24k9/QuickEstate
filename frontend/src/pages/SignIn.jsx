@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signInFailure, signInStart, signInSuccess } from "../stores/userSlice";
 import OAuth from "../components/OAuth";
 import { validateFormData } from "../utils/validateAuthData";
+import { APIS } from "../utils/constants";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
@@ -33,7 +34,7 @@ const SignIn = () => {
       dispatch(signInStart());
 
       const res = await axios.post(
-        "/api/auth/signin",
+        APIS.AUTH.SIGN_IN_URL,
         JSON.stringify(formData),
         {
           headers: {

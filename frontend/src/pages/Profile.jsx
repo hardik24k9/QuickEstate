@@ -21,6 +21,7 @@ import {
 } from "../stores/userSlice";
 import { Link } from "react-router-dom";
 import { getErrorMessage, validateFormData } from "../utils/validateAuthData";
+import { APIS } from "../utils/constants";
 
 const Profile = () => {
   const profileImg = useRef(null);
@@ -45,7 +46,6 @@ const Profile = () => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
-    console.log(storageRef);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -70,25 +70,24 @@ const Profile = () => {
     setFormData({ ...formData, [event.target.id]: event.target.value });
   };
 
-  // console.log(formData);
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     dispatch(updateUserStart());
 
-    const formError = validateFormData(formData);
-    if (formError) {
-      dispatch(updateUserFailure(formError));
-      return;
+    if (formData.email || formData.password) {
+      const formError = validateFormData(formData, true);
+      if (formError) {
+        dispatch(updateUserFailure(formError));
+        return;
+      }
     }
 
     try {
       const response = await axios.post(
-        `/api/user/update/${currentUser._id}`,
+        `${APIS.USER.UPDATE_URL}/${currentUser._id}`,
         JSON.stringify(formData),
         { headers: { "Content-Type": "application/json" } }
       );
-      // console.log(response.data);
 
       if (response.status === false) {
         dispatch(updateUserFailure(response.message));
@@ -110,9 +109,12 @@ const Profile = () => {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const resp = await axios.delete(`/api/user/delete/${currentUser._id}`, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const resp = await axios.delete(
+        `${APIS.USER.DELETE_URL}/${currentUser._id}`,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (resp.status === false) {
         dispatch(updateUserFailure(resp.message));
@@ -129,7 +131,7 @@ const Profile = () => {
     dispatch(signOutUserStart());
 
     try {
-      const resp = await axios.get("/api/auth/signout", {
+      const resp = await axios.get(APIS.AUTH.SIGN_OUT_URL, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -149,9 +151,12 @@ const Profile = () => {
       setShowListingsError(false);
 
       if (!showListings) {
-        const resp = await axios.get(`/api/user/listings/${currentUser._id}`, {
-          headers: { "Content-Type": "application/json" },
-        });
+        const resp = await axios.get(
+          `${APIS.USER.FETCH_USER_LISTINGS_URL}/${currentUser._id}`,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         if (resp.status === false) {
           setShowListingsError(true);
@@ -170,9 +175,8 @@ const Profile = () => {
 
   const handleListingDelete = async (listingId) => {
     try {
-      const resp = axios.delete(`/api/listing/delete/${listingId}`);
+      const resp = axios.delete(`${APIS.LISTING.DELETE_URL}/${listingId}`);
       if (resp.status === false) {
-        console.log(resp.message);
         return;
       }
 
@@ -186,7 +190,9 @@ const Profile = () => {
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
+      <h1 className="text-3xl font-semibold text-center my-6 lg:my-7">
+        Profile
+      </h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="file"
@@ -199,7 +205,7 @@ const Profile = () => {
           src={formData.avatar || currentUser.avatar}
           alt="profile"
           onClick={() => profileImg.current.click()}
-          className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mb-3"
+          className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mb-2"
         />
         <p className="text-sm self-center">
           {fileUploadError ? (
@@ -280,7 +286,7 @@ const Profile = () => {
         userListings &&
         (userListings.length > 0 ? (
           <div className="flex flex-col gap-4">
-            <h1 className="text-center mt-7 text-2xl font-semibold">
+            <h1 className="text-center mt-3 text-2xl font-semibold">
               Your Listings
             </h1>
             {userListings.map((listing) => (

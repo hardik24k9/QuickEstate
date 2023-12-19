@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ListingItem from "../components/ListingItem";
+import { APIS } from "../utils/constants";
 
 export const Search = () => {
   const [sidebarData, setSidebarData] = useState({
@@ -72,7 +73,7 @@ export const Search = () => {
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set("startIndex", startIndex);
     const searchQuery = urlParams.toString();
-    const resp = await axios.get(`/api/listing/search?${searchQuery}`);
+    const resp = await axios.get(`${APIS.LISTING.SEARCH_URL}?${searchQuery}`);
     const data = resp.data;
 
     if (data.length < 9) {
@@ -114,7 +115,9 @@ export const Search = () => {
     const fetchListings = async () => {
       setLoading(true);
       const searchQuery = urlParams.toString();
-      const response = await axios.get(`/api/listing/search?${searchQuery}`);
+      const response = await axios.get(
+        `${APIS.LISTING.SEARCH_URL}?${searchQuery}`
+      );
 
       if (response.success === false) {
         setLoading(false);

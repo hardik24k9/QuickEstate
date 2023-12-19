@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { APIS } from "../utils/constants";
 
 const Contact = ({ listing }) => {
   const [landlord, setLandlord] = useState(null);
@@ -12,7 +13,9 @@ const Contact = ({ listing }) => {
   useEffect(() => {
     const fetchLandlord = async () => {
       try {
-        const resp = await axios.get(`/api/user/find/${listing?.userRef}`);
+        const resp = await axios.get(
+          `${APIS.USER.FIND_URL}/${listing?.userRef}`
+        );
         setLandlord(resp.data);
       } catch (error) {
         console.log(error);
@@ -29,7 +32,7 @@ const Contact = ({ listing }) => {
           <p>
             Contact <span className="font-semibold">{landlord.username}</span>{" "}
             for{" "}
-            <span className="font-semibold">{listing.name.toLowerCase()}</span>
+            <span className="font-semibold">{listing.name?.toLowerCase()}</span>
           </p>
           <textarea
             name="message"
